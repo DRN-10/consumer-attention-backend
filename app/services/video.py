@@ -1,44 +1,43 @@
 import cv2
 import time
 
-def start_video_stream():
-    print("Initializing camera... Press 'q' in the video window to quit.")
-    # 0 is the default ID for your computer's built-in webcam
+def test_camera_stream():
+    # 0 is usually your laptop's default webcam
     cap = cv2.VideoCapture(0)
-
+    
     if not cap.isOpened():
         print("Error: Could not open webcam.")
         return
 
     frame_count = 0
-    start_time = time.time()
+    print("Starting video stream... Press 'q' to quit.")
 
     while True:
-        # Read the current frame from the camera
-        success, frame = cap.read()
-        if not success:
-            print("Error: Failed to capture frame.")
+        ret, frame = cap.read()
+        if not ret:
+            print("Failed to grab frame.")
             break
-        
+            
         frame_count += 1
-        elapsed_time = round(time.time() - start_time, 1)
         
-        # Add metadata text directly onto the video frame
-        cv2.putText(frame, f"Frame: {frame_count} | Time: {elapsed_time}s", (15, 35), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        # Resize frame as requested by mentor for stable processing
+        resized_frame = cv2.resize(frame, (640, 480))
         
-        # Open a window to display the live feed
-        cv2.imshow("Retail Stream Verification", frame)
+        # Log metadata to console every 30 frames (about once a second)
+        if frame_count % 30 == 0:
+            print(f"Processed Frame: {frame_count} | Timestamp: {time.time()}")
 
-        # Listen for the 'q' key to stop the stream
+        # Show the video feed
+        cv2.imshow('Retail Stream - OpenCV Test', resized_frame)
+
+        # Listen for the 'q' key to quit
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Clean up and close the camera gracefully
+    # Clean up securely
     cap.release()
     cv2.destroyAllWindows()
-    print("Video stream safely closed.")
+    print("Stream closed securely without memory leaks.")
 
-# This allows us to run this file directly from the terminal
 if __name__ == "__main__":
-    start_video_stream()
+    test_camera_stream()
